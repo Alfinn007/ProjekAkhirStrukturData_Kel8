@@ -6,23 +6,19 @@ import itertools
 import math
 from streamlit_folium import st_folium
 
-# --- IMPORT MODULE BUATAN SENDIRI ---
 try:
     from modules.graph_algo import TobaccoGraph
 except ImportError:
-    st.error("⚠️ Error: File 'modules/graph_algo.py' tidak ditemukan.")
+    st.error("Error: File 'modules/graph_algo.py' tidak ditemukan.")
     st.stop()
 
-# --- KONFIGURASI HALAMAN ---
 st.set_page_config(page_title="Sistem Optimasi Tembakau", layout="wide", initial_sidebar_state="expanded")
 
-# --- DATA USER (Hardcoded) ---
 USERS = {
     "bos@tembakau.com": {"pass": "admin123", "role": "bos", "name": "Bapak Pimpinan"},
     "karyawan@tembakau.com": {"pass": "user123", "role": "karyawan", "name": "Staff Logistik"}
 }
 
-# --- FUNGSI HITUNG JARAK (HAVERSINE) ---
 def hitung_jarak(lat1, lon1, lat2, lon2):
     R = 6371.0
     lat1_rad = math.radians(lat1)
@@ -35,7 +31,6 @@ def hitung_jarak(lat1, lon1, lat2, lon2):
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return round(R * c, 2)
 
-# --- FUNGSI LOAD & SAVE DATA ---
 @st.cache_data
 def load_data():
     try:
@@ -60,7 +55,6 @@ def save_data(new_data):
         json.dump(new_data, f, indent=4)
     st.cache_data.clear()
 
-# --- SESSION STATE ---
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'user_role' not in st.session_state:
@@ -68,7 +62,6 @@ if 'user_role' not in st.session_state:
 if 'route_result' not in st.session_state:
     st.session_state.route_result = None
 
-# --- LOGIN PAGE ---
 def login_page():
     st.markdown("<h1 style='text-align: center;'>🔐 Login Sistem Distribusi</h1>", unsafe_allow_html=True)
     st.markdown("---")
@@ -89,16 +82,13 @@ def login_page():
     st.info("Akun Demo: bos@tembakau.com / admin123")
     st.info("Akun Demo: karyawan@tembakau.com / user123")
 
-# --- MAIN APP ---
 def main_app():
     data = load_data()
     
-    # Ambil koordinat saja, abaikan data['edges']
     koordinat = {}
     for nama, info in data['nodes'].items():
         koordinat[nama] = (info['lat'], info['lon'])
 
-    # --- SIDEBAR ---
     with st.sidebar:
         st.title(f"👨‍💼 {st.session_state.user_name}")
         st.caption(f"Akses: {st.session_state.user_role.upper()}")
@@ -118,16 +108,12 @@ def main_app():
         
         st.markdown("---")
         
-        # --- LOGIKA BARU: GENERATE JALUR OTOMATIS (Full Connected) ---
-        # Kita buat semua kemungkinan jalur antar titik
         all_possible_routes = []
         node_names = sorted(list(koordinat.keys()))
         
-        # itertools.combinations membuat pasangan unik: (A, B), (A, C), (B, C) dst.
         for u, v in itertools.combinations(node_names, 2):
             all_possible_routes.append(f"{u} -> {v}")
 
-        # PARAMETER CONFIG
         st.subheader("⚙️ Parameter & Simulasi")
         
         rusak = st.multiselect(
@@ -141,29 +127,20 @@ def main_app():
             konsumsi_bbm = st.number_input("Konsumsi BBM (Km/L)", value=8)
             kecepatan = st.number_input("Kecepatan Rata-rata (Km/Jam)", value=40)
 
-    # --- INIT GRAPH OTOMATIS (MENGABAIKAN JSON EDGES) ---
     graph = TobaccoGraph()
     
-    # Loop untuk menghubungkan SEMUA titik dengan SEMUA titik (Mesh Topology)
-    # Kecuali yang dipilih di menu "Rusak"
     for u, v in itertools.combinations(node_names, 2):
-        route_name_1 = f"{u} -> {v}" # A ke B
-        route_name_2 = f"{v} -> {u}" # B ke A (untuk jaga-jaga pengecekan string)
+        route_name_1 = f"{u} -> {v}" 
+        route_name_2 = f"{v} -> {u}" 
         
-        # Cek apakah jalur ini sedang disimulasikan rusak
         if route_name_1 not in rusak and route_name_2 not in rusak:
             lat1, lon1 = koordinat[u]
             lat2, lon2 = koordinat[v]
             
-            # Hitung Jarak Real-time
             jarak = hitung_jarak(lat1, lon1, lat2, lon2)
             
-            # Masukkan ke Graph
-            # add_edge di class Anda biasanya sudah bolak-balik (undirected), 
-            # tapi tidak ada salahnya memastikan logika di sini.
             graph.add_edge(u, v, jarak)
 
-    # --- MENU 1: RUTE + OPTIMASI TSP ---
     if menu == "Pencarian Rute":
         st.title("🚛 Optimasi Rute Distribusi (Mode Otomatis)")
         st.info("ℹ️ Sistem menggunakan mode **Fully Connected**. Semua titik dianggap terhubung garis lurus kecuali diblokir.")
@@ -192,7 +169,6 @@ def main_app():
             calc_btn = st.button("🚀 Hitung Rute Tercepat", type="primary")
             
 
-        # --- LOGIKA PERHITUNGAN ---
         if calc_btn:
             if len(stops) > 8:
                 st.error("Terlalu banyak titik singgah!")
@@ -256,7 +232,6 @@ def main_app():
             else:
                 st.session_state.route_result = {"success": False}
 
-        # --- TAMPILKAN HASIL ---
         if st.session_state.route_result:
             result = st.session_state.route_result
             
@@ -283,32 +258,27 @@ def main_app():
                 with col_map:
                     st.markdown("### 🗺️ Visualisasi Peta")
                     
-                    # --- FITUR BARU: TOMBOL TAMPILKAN JALUR RUSAK ---
                     show_error_paths = st.checkbox("🔴 Tampilkan Jalur Error (Rusak/Macet)", value=True)
 
                     center_lat, center_lon = koordinat[result["start"]]
                     m = folium.Map(location=[center_lat, center_lon], zoom_start=11)
                     
-                    # 1. GAMBAR JALUR RUSAK (Jika dicentang)
                     if show_error_paths and rusak:
                         for jalur_str in rusak:
-                            # Format string: "NodeA -> NodeB"
                             try:
                                 origin, dest = jalur_str.split(" -> ")
                                 if origin in koordinat and dest in koordinat:
                                     path_coords_error = [koordinat[origin], koordinat[dest]]
                                     
-                                    # Gambar garis merah putus-putus
                                     folium.PolyLine(
                                         locations=path_coords_error, 
                                         color="red", 
                                         weight=4, 
                                         opacity=0.6,
-                                        dash_array='10, 10',  # Membuat garis putus-putus
+                                        dash_array='10, 10', 
                                         tooltip=f"⛔ JALUR TERPUTUS: {origin} ke {dest}"
                                     ).add_to(m)
                                     
-                                    # Tambahkan icon silang di tengah jalur (opsional, visual manis)
                                     mid_lat = (koordinat[origin][0] + koordinat[dest][0]) / 2
                                     mid_lon = (koordinat[origin][1] + koordinat[dest][1]) / 2
                                     folium.Marker(
@@ -319,7 +289,6 @@ def main_app():
                             except ValueError:
                                 continue
 
-                    # 2. GAMBAR GARIS RUTE OPTIMAL (Biru)
                     path_coords = [koordinat[nama] for nama in result["full_path"] if nama in koordinat]
                     if path_coords:
                         folium.PolyLine(
@@ -330,7 +299,6 @@ def main_app():
                             tooltip="Jalur Optimal"
                         ).add_to(m)
                         
-                        # Animasi gerak (AntPath) agar lebih keren
                         AntPath(
                             locations=path_coords,
                             dash_array=[10, 20],
@@ -341,7 +309,6 @@ def main_app():
                             opacity=0.6
                         ).add_to(m)
                     
-                    # 3. GAMBAR MARKER (Titik Lokasi)
                     for nama, coord in koordinat.items():
                         color = "lightgray"; icon = "info-sign"; popup = nama
                         
@@ -360,7 +327,6 @@ def main_app():
             else:
                 st.error("❌ Jalur tidak ditemukan! Semua akses ke tujuan mungkin terblokir.")
 
-    # --- MENU 2: MANAJEMEN (BOS) ---
     elif menu == "Manajemen Jalur (Bos)":
         st.title("🛠️ Manajemen Lokasi (Node)")
         st.info("ℹ️ Klik pada peta untuk mendapatkan koordinat lokasi baru secara otomatis.")
@@ -368,14 +334,11 @@ def main_app():
         tab1, tab3 = st.tabs(["➕ Tambah Node (Peta)", "📂 Data JSON"])
         
         with tab1:
-            # 1. Tampilkan Peta untuk Picking
             st.markdown("### 🗺️ Pilih Lokasi di Peta")
             
-            # Tentukan tengah peta (bisa ambil rata-rata dari node yang ada atau hardcode Jember)
             center_lat, center_lon = -8.25, 113.6 
             m_picker = folium.Map(location=[center_lat, center_lon], zoom_start=11)
             
-            # Tampilkan node yang SUDAH ADA sebagai referensi (warna abu-abu)
             for nama, info in data['nodes'].items():
                 folium.Marker(
                     [info['lat'], info['lon']], 
@@ -383,14 +346,10 @@ def main_app():
                     icon=folium.Icon(color="gray", icon="info-sign")
                 ).add_to(m_picker)
 
-            # Tambahkan instruksi klik
             m_picker.add_child(folium.LatLngPopup())
 
-            # Render peta dan tangkap event klik
             map_data = st_folium(m_picker, height=400, width="100%", key="map_picker")
 
-            # 2. Logika Menangkap Koordinat
-            # Default value jika belum klik
             click_lat = -8.2000
             click_lon = 113.6000
 
@@ -403,7 +362,6 @@ def main_app():
 
             st.markdown("---")
 
-            # 3. Form Input Data
             with st.form("add_node"):
                 st.subheader("📝 Detail Lokasi Baru")
                 
@@ -413,7 +371,6 @@ def main_app():
                     name = st.text_input("Nama Lokasi Baru (Cth: Gudang_Wirolegi)")
                 
                 with col_form2:
-                    # Value mengambil dari variabel click_lat/lon yang update saat peta diklik
                     lat = st.number_input("Latitude", value=click_lat, format="%.5f")
                     lon = st.number_input("Longitude", value=click_lon, format="%.5f")
                 
@@ -423,10 +380,9 @@ def main_app():
                         save_data(data)
                         st.success(f"✅ Lokasi '{name}' berhasil disimpan! Koordinat: {lat}, {lon}")
                         
-                        # Hapus cache/session agar peta ter-refresh
                         st.session_state.pop("map_picker", None) 
                         import time
-                        time.sleep(1) # Jeda sedikit agar user membaca pesan sukses
+                        time.sleep(1) 
                         st.rerun()
                     elif name in data['nodes']:
                         st.error("❌ Nama lokasi sudah ada! Harap gunakan nama lain.")
