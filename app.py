@@ -4,23 +4,19 @@ import folium
 import itertools 
 from streamlit_folium import st_folium
 
-# --- IMPORT MODULE BUATAN SENDIRI ---
 try:
     from modules.graph_algo import TobaccoGraph
 except ImportError:
-    st.error("⚠️ Error: File 'modules/graph_algo.py' tidak ditemukan.")
+    st.error("Error: File 'modules/graph_algo.py' tidak ditemukan.")
     st.stop()
 
-# --- KONFIGURASI HALAMAN ---
 st.set_page_config(page_title="Sistem Optimasi Tembakau", layout="wide", initial_sidebar_state="expanded")
 
-# --- DATA USER (Hardcoded) ---
 USERS = {
     "bos@tembakau.com": {"pass": "admin123", "role": "bos", "name": "Bapak Pimpinan"},
     "karyawan@tembakau.com": {"pass": "user123", "role": "karyawan", "name": "Staff Logistik"}
 }
 
-# --- FUNGSI LOAD & SAVE DATA ---
 @st.cache_data
 def load_data():
     try:
@@ -50,17 +46,13 @@ def save_data(new_data):
         json.dump(new_data, f, indent=4)
     st.cache_data.clear()
 
-# --- SESSION STATE ---
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
 if 'user_role' not in st.session_state:
     st.session_state.user_role = None
-
-# [FIX] Inisialisasi State untuk Hasil Perhitungan agar tidak hilang saat Rerun
 if 'route_result' not in st.session_state:
-    st.session_state.route_result = None # Akan diisi dictionary hasil
+    st.session_state.route_result = None
 
-# --- LOGIN PAGE ---
 def login_page():
     st.markdown("<h1 style='text-align: center;'>🔐 Login Sistem Distribusi</h1>", unsafe_allow_html=True)
     st.markdown("---")
@@ -81,18 +73,15 @@ def login_page():
                     st.error("Email atau Password salah!")
     st.info("Akun Demo:\n\nBos: bos@tembakau.com / admin123\n\nKaryawan: karyawan@tembakau.com / user123")
 
-# --- MAIN APP ---
 def main_app():
     data = load_data()
     
-    # --- SIDEBAR ---
     with st.sidebar:
         st.title(f"👨‍💼 {st.session_state.user_name}")
         st.caption(f"Akses: {st.session_state.user_role.upper()}")
         
         if st.button("Logout", type="secondary"):
             st.session_state.logged_in = False
-            # Reset hasil hitungan juga saat logout
             st.session_state.route_result = None
             st.rerun()
         
@@ -106,7 +95,6 @@ def main_app():
         
         st.markdown("---")
         
-        # PARAMETER CONFIG
         st.subheader("⚙️ Parameter & Simulasi")
         all_routes = [f"{e['from']} -> {e['to']}" for e in data['edges']]
         rusak = st.multiselect(
@@ -120,7 +108,6 @@ def main_app():
             konsumsi_bbm = st.number_input("Konsumsi BBM (Km/L)", value=8)
             kecepatan = st.number_input("Kecepatan Rata-rata (Km/Jam)", value=40)
 
-    # --- INIT GRAPH (Imported Class) ---
     graph = TobaccoGraph()
     koordinat = {}
 
@@ -132,7 +119,6 @@ def main_app():
         if nama_rute not in rusak:
             graph.add_edge(rute['from'], rute['to'], rute['weight'])
 
-    # --- MENU 1: RUTE + OPTIMASI TSP ---
     if menu == "Pencarian Rute":
         st.title("🚛 Optimasi Rute Distribusi")
         
@@ -158,7 +144,6 @@ def main_app():
 
             calc_btn = st.button("🚀 Hitung Rute Tercepat", type="primary")
 
-        # --- LOGIKA TOMBOL (SIMPAN HASIL KE SESSION STATE) ---
         if calc_btn:
             best_route_sequence = []
             best_full_path = []
@@ -208,7 +193,6 @@ def main_app():
             my_bar.empty()
 
             if found_solution:
-                # [FIX] SIMPAN KE SESSION STATE
                 st.session_state.route_result = {
                     "success": True,
                     "dist": min_total_dist,
@@ -221,7 +205,6 @@ def main_app():
             else:
                 st.session_state.route_result = {"success": False}
 
-        # --- TAMPILKAN HASIL DARI SESSION STATE (AGAR TIDAK HILANG SAAT RERUN) ---
         if st.session_state.route_result:
             result = st.session_state.route_result
             
@@ -273,9 +256,8 @@ def main_app():
             else:
                 st.error("❌ Jalur tidak ditemukan! Cek apakah ada jalan yang terputus.")
 
-    # --- MENU 2: MANAJEMEN (BOS) ---
     elif menu == "Manajemen Jalur (Bos)":
-        st.title("🛠️ Manajemen Database")
+        st.title("Manajemen Database")
         tab1, tab2, tab3 = st.tabs(["➕ Tambah Node", "🛣️ Tambah Edge", "📂 Data JSON"])
         
         with tab1:
