@@ -36,93 +36,17 @@
             "lat": -8.1721,
             "lon": 113.7007
         },
-        "Mojokerto": {
+        "adit": {
             "lat": -8.2,
             "lon": 113.6
         },
-        "banyuwangi": {
-            "lat": -8.1,
-            "lon": 115.6
+        "Lampeji": {
+            "lat": -8.242220055140395,
+            "lon": 113.75580706321219
         },
-        "pler": {
-            "lat": -7.2,
-            "lon": 116.6
-        },
-        "yok": {
-            "lat": -4.2,
-            "lon": 110.6
+        "mayang": {
+            "lat": -8.172411072818067,
+            "lon": 113.7952994502037
         }
-    },
-    "edges": [
-        {
-            "from": "Wuluhan",
-            "to": "Ambulu",
-            "weight": 7
-        },
-        {
-            "from": "Wuluhan",
-            "to": "Balung",
-            "weight": 10
-        },
-        {
-            "from": "Ambulu",
-            "to": "Jenggawah",
-            "weight": 8
-        },
-        {
-            "from": "Balung",
-            "to": "Rambipuji",
-            "weight": 12
-        },
-        {
-            "from": "Jenggawah",
-            "to": "Ajung",
-            "weight": 6
-        },
-        {
-            "from": "Jenggawah",
-            "to": "Mangli",
-            "weight": 15
-        },
-        {
-            "from": "Ajung",
-            "to": "Gudang_Pusat",
-            "weight": 5
-        },
-        {
-            "from": "Rambipuji",
-            "to": "Gudang_Pusat",
-            "weight": 9
-        },
-        {
-            "from": "Mangli",
-            "to": "Gudang_Pusat",
-            "weight": 4
-        },
-        {
-            "from": "Mangli",
-            "to": "Mojokerto",
-            "weight": 5
-        },
-        {
-            "from": "Ajung",
-            "to": "banyuwangi",
-            "weight": 3
-        },
-        {
-            "from": "Ajung",
-            "to": "pler",
-            "weight": 4
-        },
-        {
-            "from": "Ajung",
-            "to": "yok",
-            "weight": 5
-        },
-        {
-            "from": "Ajung",
-            "to": "Ambulu",
-            "weight": 6
-        }
-    ]
+    }
 }

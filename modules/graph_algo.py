@@ -55,7 +55,6 @@ class TobaccoGraph:
         self.titik[to_node][from_node] = weight  
       
     def dijkstra(self, start_node, end_node):
-        # Proteksi jika node tidak ada di graph
         if start_node not in self.titik or end_node not in self.titik:
              return [], 0
 
@@ -98,7 +97,7 @@ class TobaccoGraph:
         current_node = end_node
         
         while current_node is not None:
-            path.append(current_node)
+            path.append(current_node)   
             if current_node == start_node:
                 break
             current_node = previous_nodes[current_node]
