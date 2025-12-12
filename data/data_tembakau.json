@@ -1,27 +1,52 @@
 {
-  "meta": {
-    "project": "Optimasi Distribusi Tembakau Jember",
-    "version": "1.0"
-  },
-  "nodes": {
-    "Wuluhan": {"lat": -8.2289, "lon": 113.4864},
-    "Ambulu": {"lat": -8.3447, "lon": 113.6067},
-    "Balung": {"lat": -8.2611, "lon": 113.5239},
-    "Jenggawah": {"lat": -8.2833, "lon": 113.6667},
-    "Rambipuji": {"lat": -8.2047, "lon": 113.6111},
-    "Ajung": {"lat": -8.2167, "lon": 113.6667},
-    "Mangli": {"lat": -8.1833, "lon": 113.6500},
-    "Gudang_Pusat": {"lat": -8.1721, "lon": 113.7007}
-  },
-  "edges": [
-    {"from": "Wuluhan", "to": "Ambulu", "weight": 7},
-    {"from": "Wuluhan", "to": "Balung", "weight": 10},
-    {"from": "Ambulu", "to": "Jenggawah", "weight": 8},
-    {"from": "Balung", "to": "Rambipuji", "weight": 12},
-    {"from": "Jenggawah", "to": "Ajung", "weight": 6},
-    {"from": "Jenggawah", "to": "Mangli", "weight": 15},
-    {"from": "Ajung", "to": "Gudang_Pusat", "weight": 5},
-    {"from": "Rambipuji", "to": "Gudang_Pusat", "weight": 9},
-    {"from": "Mangli", "to": "Gudang_Pusat", "weight": 4}
-  ]
+    "meta": {
+        "project": "Optimasi Distribusi Tembakau Jember",
+        "version": "1.0"
+    },
+    "nodes": {
+        "Wuluhan": {
+            "lat": -8.2289,
+            "lon": 113.4864
+        },
+        "Ambulu": {
+            "lat": -8.3447,
+            "lon": 113.6067
+        },
+        "Balung": {
+            "lat": -8.2611,
+            "lon": 113.5239
+        },
+        "Jenggawah": {
+            "lat": -8.2833,
+            "lon": 113.6667
+        },
+        "Rambipuji": {
+            "lat": -8.2047,
+            "lon": 113.6111
+        },
+        "Ajung": {
+            "lat": -8.2167,
+            "lon": 113.6667
+        },
+        "Mangli": {
+            "lat": -8.1833,
+            "lon": 113.65
+        },
+        "Gudang_Pusat": {
+            "lat": -8.1721,
+            "lon": 113.7007
+        },
+        "adit": {
+            "lat": -8.2,
+            "lon": 113.6
+        },
+        "Lampeji": {
+            "lat": -8.242220055140395,
+            "lon": 113.75580706321219
+        },
+        "mayang": {
+            "lat": -8.172411072818067,
+            "lon": 113.7952994502037
+        }
+    }
 }
